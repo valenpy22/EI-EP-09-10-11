@@ -41,18 +41,9 @@ print(summary(modelo))
 
 # Revisar variabilidad que sea distinta de 0
 
-
 # Residuos homocedásticos (varianzas similares)
 car::ncvTest(modelo)
 
-# No debe existir multicolinealidad
-vifs <- vif(modelo)
-cat("\nVerificar la multicolinealidad:\n")
-car("- VIFs:\n")
-print(vifs)
-cat("- Tolerancias:\n")
-print(1 / vifs)
-cat("- VIF medio:", mean(vifs), "\n")
 # Residuos deben seguir una distribución cercana a la normal centrada en cero
 
 # 6. Usando herramientas para la exploración de modelos del entorno R, buscar entre 
@@ -71,6 +62,15 @@ print(modelo)
 cat("#### Modelo con predictor Hip.Girth ####")
 modelo <- update(modelo, . ~ . + Hip.Girth)
 print(modelo)
+
+# No debe existir multicolinealidad
+vifs <- vif(modelo)
+cat("\nVerificar la multicolinealidad:\n")
+cat("- VIFs:\n")
+print(vifs)
+cat("- Tolerancias:\n")
+print(1 / vifs)
+cat("- VIF medio:", mean(vifs), "\n")
 
 # 7. Evaluar los modelos y “arreglarlos” en caso de que tengan algún problema con 
 # las condiciones que deben cumplir.
