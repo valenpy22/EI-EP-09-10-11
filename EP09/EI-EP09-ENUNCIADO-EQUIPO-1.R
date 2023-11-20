@@ -36,7 +36,7 @@ muestra_hombres <- sample_n(hombres, 50)
 
 # 5. Usando el entorno R, construir un modelo de regresión lineal simple con el 
 # predictor seleccionado en el paso anterior.
-modelo <- lm(Weight ~ Thigh.Girth, data = datos)
+modelo <- lm(Weight ~ Thigh.Girth, data = muestra_hombres)
 print(summary(modelo))
 
 # Revisar variabilidad que sea distinta de 0
@@ -63,6 +63,18 @@ cat("#### Modelo con predictor Hip.Girth ####")
 modelo <- update(modelo, . ~ . + Hip.Girth)
 print(modelo)
 
+cat("#### Modelo con predictor Wrist.diameter ####")
+modelo <- update(modelo, . ~ . + Wrists.diameter)
+print(modelo)
+
+cat("#### Modelo con predictor Knees.diameter ####")
+modelo <- update(modelo, . ~ . + Knees.diameter)
+print(modelo)
+
+cat("#### Modelo con predictor Ankle.Minimum.Girth ####")
+modelo <- update(modelo, . ~ . + Ankle.Minimum.Girth)
+print(modelo)
+
 # No debe existir multicolinealidad
 vifs <- vif(modelo)
 cat("\nVerificar la multicolinealidad:\n")
@@ -77,9 +89,11 @@ cat("Prueba de Durbin-Watson para autocorrelaciones")
 cat("entre errores:\n")
 print(durbinWatsonTest(modelo))
 
+
 # Comprobar normalidad de los residuos
 cat("\nPrueba de normalidad para los residuos:\n")
 print(shapiro.test(modelo$residuals))
+
 
 # Comprobar homocedasticidad de las residuos
 cat("Prueba de homocedasticidad de los residuos:\n")
@@ -88,7 +102,21 @@ print(ncvTest(modelo))
 # 7. Evaluar los modelos y “arreglarlos” en caso de que tengan algún problema con 
 # las condiciones que deben cumplir.
 
-
 # 8. Evaluar el poder predictivo del modelo en datos no utilizados para construirlo 
 # (o utilizando validación cruzada).
 
+n <- nrow(datos)
+n_entrenamiento <- floor(0.7 * n)
+
+muestra <- sample.int(n = n, size = n_entrenamiento, replace = FALSE)
+entrenamiento <- datos[muestra, ]
+prueba <- datos[-muestra, ]
+
+mse_entrenamiento <- mean(modelo$residuals ** 2)
+
+predicciones <- predict(modelo, prueba)
+
+error <- prueba[["Thigh.Girth"]] - predicciones
+mse_prueba <- mean(error ** 2)
+
+cat(mse_prueba)
