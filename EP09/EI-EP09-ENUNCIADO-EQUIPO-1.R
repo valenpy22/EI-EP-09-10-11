@@ -46,8 +46,13 @@ print(summary(modelo))
 car::ncvTest(modelo)
 
 # No debe existir multicolinealidad
-
-
+vifs <- vif(modelo)
+cat("\nVerificar la multicolinealidad:\n")
+car("- VIFs:\n")
+print(vifs)
+cat("- Tolerancias:\n")
+print(1 / vifs)
+cat("- VIF medio:", mean(vifs), "\n")
 # Residuos deben seguir una distribución cercana a la normal centrada en cero
 
 # 6. Usando herramientas para la exploración de modelos del entorno R, buscar entre 
