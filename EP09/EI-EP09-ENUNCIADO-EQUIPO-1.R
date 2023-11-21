@@ -12,7 +12,7 @@ set.seed(5689)
 
 # 2. Seleccionar una muestra de 50 mujeres (si la semilla es un número par) o 50 
 # hombres (si la semilla es impar).
-datos <- read.csv2("Desktop/EI-EP-09-10-11/EP09/EP09 Datos.csv", fileEncoding = "UTF-8")
+datos <- read.csv2("EP09 Datos.csv", fileEncoding = "UTF-8")
 
 head(datos)
 
@@ -101,6 +101,12 @@ print(ncvTest(modelo))
 
 # 7. Evaluar los modelos y “arreglarlos” en caso de que tengan algún problema con 
 # las condiciones que deben cumplir.
+
+# En una primera instancia ocupamos 2 variables la cuales fueron Waist.Girth y 
+# Hip.Girth pero solo con estas no se estaba cumpliendo la condicion de 
+# homocedasticidad por lo que agregamos  Wrists.diameter, Knees.diameter y 
+# Ankle.Minimum.Girth y con estas nuevas varaibles ya estabamos cumpliendo todas
+# las condiciones
 
 # 8. Evaluar el poder predictivo del modelo en datos no utilizados para construirlo 
 # (o utilizando validación cruzada).
