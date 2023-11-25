@@ -13,7 +13,7 @@ set.seed(5689)
 
 # 2. Seleccionar una muestra de 50 mujeres (si la semilla es un número par) o 50 
 # hombres (si la semilla es impar).
-datos <- read.csv2("Desktop/EI-EP-09-10-11/EP09/EP09 Datos.csv", fileEncoding = "UTF-8")
+datos <- read.csv2("EP09 Datos.csv", fileEncoding = "UTF-8")
 
 head(datos)
 
@@ -123,7 +123,7 @@ predictors <- data.frame(Knees.diameter = muestra_hombres$Knees.diameter,
                          Ankle.Minimum.Girth = muestra_hombres$Ankle.Minimum.Girth,
                          Thigh.Girth = muestra_hombres$Thigh.Girth)
 
-# PPreparar la variable de salida
+# Preparar la variable de salida
 outcome <- muestra_hombres$Weight
 
 # Validación cruzada de 10 pliegues
@@ -137,7 +137,11 @@ cv_model <- train(x = predictors, y = outcome,
 print(cv_model)
 
 # Podemos decir que en base a los 3 resultados:
-# RMSE: 
+# RMSE: Se tiene un resultado de 4.274228, por tanto, el error de las predicciones del
+# modelo se desvían por un margen considerable, pero debido a lo amplio que son
+# los datos, que se desvien por 4.274 unidades está dentro de lo esperado.
 # R-squared: Se tiene un valor de 0,8427421, por lo que en un 84,27% de la variabilidad
 # den el peso puede ser explicada por las variables independientes del modelo.
-# MAE: 
+# MAE: Se tiene un valor de 3.453683, al igual que con el RMSE, debido a lo amplio que
+# son los valores del peso, las diferencias entre los valores reales y la predicción
+# se encuentran en lo que se esperaría de un modelo predictivo.
