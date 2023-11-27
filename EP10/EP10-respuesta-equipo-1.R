@@ -5,7 +5,15 @@
 # 2. Si bien esta variable se usa para clasificar a las personas en varias clases de estado nutricional (bajo peso, normal, sobrepeso, obesidad, obesidad mórbida), para efectos de este ejercicio, usaremos dos clases: sobrepeso (IMC ≥ 25,0) y no sobrepeso (IMC < 25,0).
 # 3. El equipo crea la variable dicotómica EN (estado nutricional) de acuerdo al valor de IMC de cada persona.
 
+datos <- read.csv2("Desktop/EI-EP-09-10-11/EP10/EP09 Datos.csv")
 
+head(datos)
+
+datos[["IMC"]] <- datos[["Weight"]]/((datos[["Height"]])/100)^2
+
+datos[["EN"]] <- ifelse(datos[["IMC"]] >= 25, "Sobrepeso", "No sobrepeso")
+
+head(datos)
 
 # Ahora podemos construir un modelo de regresión logística para predecir la variable EN, de acuerdo con las siguientes instrucciones:
 # 1. Definir la semilla a utilizar, que corresponde a los últimos cuatro dígitos del RUN (sin considerar el dígito verificador) del integrante de mayor edad del equipo.
