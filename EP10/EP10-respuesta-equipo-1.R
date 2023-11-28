@@ -111,7 +111,8 @@ modelo_logistico_2 <- glm(EN ~ Navel.Girth + Bitrochanteric.diameter,
 
 # 7. Evaluar la confiabilidad de los modelos (i.e. que tengan un buen nivel de 
 # ajuste y son generalizables) y “arreglarlos” en caso de que tengan algún problema.
-
+desviacion <- -2*logLik(modelo_logistico_2)
+desviacion
 
 # 8. Usando código estándar1, evaluar el poder predictivo de los modelos con 
 # los datos de las 40 personas que no se incluyeron en su construcción en 
