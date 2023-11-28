@@ -1,5 +1,6 @@
 # Importar librerias
 library(dplyr)
+library(pROC)
 
 # 1. El equipo crea la variable IMC (índice de masa corporal) como el peso de una persona (en kilogramos) dividida por el cuadrado de su estatura (en metros).
 # 2. Si bien esta variable se usa para clasificar a las personas en varias clases de estado nutricional (bajo peso, normal, sobrepeso, obesidad, obesidad mórbida), para efectos de este ejercicio, usaremos dos clases: sobrepeso (IMC ≥ 25,0) y no sobrepeso (IMC < 25,0).
@@ -112,10 +113,32 @@ modelo_logistico_2 <- glm(EN ~ Navel.Girth + Bitrochanteric.diameter,
 # 7. Evaluar la confiabilidad de los modelos (i.e. que tengan un buen nivel de 
 # ajuste y son generalizables) y “arreglarlos” en caso de que tengan algún problema.
 desviacion <- -2*logLik(modelo_logistico_2)
-desviacion
+cat("La desviación es de: ", desviacion)
+
+# k = número de predictores
+# n = tamaño de muestra
+k <- length(coef(modelo_logistico_2))
+n <- nrow(set_construccion)
+
+cat("La cantidad de predictores es de: ", k)
+cat("El tamaño de la muestra es de: ", n)
+
+AIC <- desviacion+2*k
+BIC <- desviacion+2*k*log(n)
+
+cat("Valor de AIC: ", AIC)
+cat("Valor de BIC: ", BIC)
 
 # 8. Usando código estándar1, evaluar el poder predictivo de los modelos con 
 # los datos de las 40 personas que no se incluyeron en su construcción en 
 # términos de sensibilidad y especificidad.
 
+cat("Evaluación del modelo a partir del conjunto de entrenamiento:\n")
+probs_e <- predict(modelo_logistico_2, set_evaluacion, type = "response")
 
+umbral <- 0.5
+preds_e <- sapply(probs_e, function(p) ifelse(p >= umbral, 1, 0))
+preds_e <- factor(preds_e, levels = levels(hombres[["EN"]]))
+
+ROC_e <- roc(set_evaluacion[["EN"]], probs_e)
+plot(ROC_e)
