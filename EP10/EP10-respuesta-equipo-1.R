@@ -83,35 +83,41 @@ set_evaluacion <- setdiff(muestra, set_construccion)
 
 # Construir el modelo de regresión logística empleando la variable "Navel.Girth"
 # con la muestra de construcción
+
+# Primer modelo
 modelo_logistico <- glm(EN ~ Navel.Girth,
                         family = binomial(link = "logit"), data = set_construccion)
+
+modeloTest <- add1(modelo_logistico, scope = .~. + Bitrochanteric.diameter + Elbows.diameter +
+                   Wrists.diameter + Knees.diameter + Waist.Girth + Hip.Girth + Knee.Girth + Ankle.Minimum.Girth)
+
+modeloTest
+
+desviacion <- -2*logLik(modelo_logistico)
+cat("La desviación es de: ", desviacion)
+
+# k = número de predictores
+# n = tamaño de muestra
+k <- length(coef(modelo_logistico))
+n <- nrow(set_construccion)
+
+cat("La cantidad de predictores es de: ", k)
+cat("El tamaño de la muestra es de: ", n)
+
+AIC <- desviacion+2*k
+BIC <- desviacion+2*k*log(n)
+
+cat("Valor de AIC: ", AIC)
+cat("Valor de BIC: ", BIC)
 
 # Resumen del modelo
 summary(modelo_logistico)
 
-# Realizar predicciones sobre el conjunto de evaluación
-predicciones_prob <- predict(modelo_logistico, newdata = set_evaluacion, type = "response")
-predicciones <- ifelse(predicciones_prob > 0.5, 1, 0)
-
-# Crear una matriz de confusión para evaluar la sensibilidad y especificidad
-matriz_confusion <- table(Prediccion = predicciones, Real = set_evaluacion$EN)
-
-# Calculando sensibilidad y especificidad
-sensibilidad <- matriz_confusion[1, 1] / sum(matriz_confusion[, 1])
-especificidad <- matriz_confusion[0, 0] / sum(matriz_confusion[, 0])
-
-# Imprimir los resultados
-print(paste("Sensibilidad:", sensibilidad))
-print(paste("Especificidad:", especificidad))
-
 # 6. Usando herramientas estándares1 para la exploración de modelos del entorno 
 # R, buscar entre dos y cinco predictores de entre las variables seleccionadas 
 # al azar, recordadas en el punto 3, para agregar al modelo obtenido en el paso 5.
-modelo_logistico_2 <- glm(EN ~ Navel.Girth, 
-                          family = binomial(link = "logit"), data = set_construccion)
+modelo_logistico_2 <- update(modelo_logistico, .~. + Waist.Girth)
 
-# 7. Evaluar la confiabilidad de los modelos (i.e. que tengan un buen nivel de 
-# ajuste y son generalizables) y “arreglarlos” en caso de que tengan algún problema.
 desviacion <- -2*logLik(modelo_logistico_2)
 cat("La desviación es de: ", desviacion)
 
@@ -129,22 +135,70 @@ BIC <- desviacion+2*k*log(n)
 cat("Valor de AIC: ", AIC)
 cat("Valor de BIC: ", BIC)
 
+modeloTest <- add1(modelo_logistico_2, scope = .~. + Bitrochanteric.diameter + Elbows.diameter +
+                     Wrists.diameter + Knees.diameter + Hip.Girth + Knee.Girth + Ankle.Minimum.Girth)
+
+modelo_logistico_3 <- update(modelo_logistico_2, .~. + Bitrochanteric.diameter)
+
+desviacion <- -2*logLik(modelo_logistico_3)
+n <- nrow(set_construccion)
+
+cat("La cantidad de predictores es de: ", k)
+cat("El tamaño de la muestra es de: ", n)
+
+AIC <- desviacion+2*k
+BIC <- desviacion+2*k*log(n)
+
+cat("Valor de AIC: ", AIC)
+cat("Valor de BIC: ", BIC)
+
+modeloTest <- add1(modelo_logistico_3, scope = .~. + Elbows.diameter +
+                     Wrists.diameter + Knees.diameter + Hip.Girth + Knee.Girth + Ankle.Minimum.Girth)
+
+ # 7. Evaluar la confiabilidad de los modelos (i.e. que tengan un buen nivel de 
+# ajuste y son generalizables) y “arreglarlos” en caso de que tengan algún problema.
+desviacion <- -2*logLik(modelo_logistico_3)
+cat("La desviación es de: ", desviacion)
+
+# k = número de predictores
+# n = tamaño de muestra
+k <- length(coef(modelo_logistico_3))
+n <- nrow(set_construccion)
+
+cat("La cantidad de predictores es de: ", k)
+cat("El tamaño de la muestra es de: ", n)
+
+AIC <- desviacion+2*k
+BIC <- desviacion+2*k*log(n)
+
+cat("Valor de AIC: ", AIC)
+cat("Valor de BIC: ", BIC)
+
+cat("Evaluación del modelo a partir del conjunto de entrenamiento:\n")
+probs_e <- predict(modelo_logistico_3, set_evaluacion, type = "response")
+umbral <- 0.5
+preds_e <- ifelse(probs_e > umbral, 1, 0)
+ROC_e <- roc(set_evaluacion[["EN"]], probs_e)
+plot(ROC_e)
+matriz_confusion <- table(Predicciones = preds_e, Real = set_evaluacion$EN)
+sensibilidad <- matriz_confusion[2, 2] / sum(matriz_confusion[2, ])
+especificidad <- matriz_confusion[1, 1] / sum(matriz_confusion[1, ])
+print(paste("Sensibilidad:", sensibilidad))
+print(paste("Especificidad:", especificidad))
+
+cat("Evaluación del modelo con el conjunto de prueba:\n")
+probs_p <- predict(modelo_logistico_3, set_construccion, type = "response")
+umbral <- 0.5
+preds_p <- ifelse(probs_p > umbral, 1, 0)
+ROC_p <- roc(set_construccion[["EN"]], probs_p)
+plot(ROC_p)
+matriz_confusion <- table(Predicciones = preds_p, Real = set_construccion$EN)
+sensibilidad <- matriz_confusion[2, 2] / sum(matriz_confusion[2, ])
+especificidad <- matriz_confusion[1, 1] / sum(matriz_confusion[1, ])
+print(paste("Sensibilidad:", sensibilidad))
+print(paste("Especificidad:", especificidad))
+
 # 8. Usando código estándar1, evaluar el poder predictivo de los modelos con 
 # los datos de las 40 personas que no se incluyeron en su construcción en 
 # términos de sensibilidad y especificidad.
 
-cat("Evaluación del modelo a partir del conjunto de entrenamiento:\n")
-probs_e <- predict(modelo_logistico_2, set_evaluacion, type = "response")
-
-umbral <- 0.5
-preds_e <- sapply(probs_e, function(p) ifelse(p >= umbral, 1, 0))
-preds_e <- factor(preds_e, levels = levels(hombres[["EN"]]))
-
-ROC_e <- roc(set_evaluacion[["EN"]], probs_e)
-plot(ROC_e)
-
-cat("Evaluación del modelo con el conjunto de prueba:\n")
-probs_p <- predict(modelo_logistico_2, set_construccion, type = "response")
-
-ROC_p <- roc(set_construccion[["EN"]], probs_p)
-plot(ROC_p)
