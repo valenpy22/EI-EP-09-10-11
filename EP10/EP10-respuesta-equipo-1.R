@@ -107,7 +107,7 @@ print(paste("Especificidad:", especificidad))
 # 6. Usando herramientas estándares1 para la exploración de modelos del entorno 
 # R, buscar entre dos y cinco predictores de entre las variables seleccionadas 
 # al azar, recordadas en el punto 3, para agregar al modelo obtenido en el paso 5.
-modelo_logistico_2 <- glm(EN ~ Navel.Girth + Bitrochanteric.diameter, 
+modelo_logistico_2 <- glm(EN ~ Navel.Girth, 
                           family = binomial(link = "logit"), data = set_construccion)
 
 # 7. Evaluar la confiabilidad de los modelos (i.e. que tengan un buen nivel de 
@@ -142,3 +142,9 @@ preds_e <- factor(preds_e, levels = levels(hombres[["EN"]]))
 
 ROC_e <- roc(set_evaluacion[["EN"]], probs_e)
 plot(ROC_e)
+
+cat("Evaluación del modelo con el conjunto de prueba:\n")
+probs_p <- predict(modelo_logistico_2, set_construccion, type = "response")
+
+ROC_p <- roc(set_construccion[["EN"]], probs_p)
+plot(ROC_p)
