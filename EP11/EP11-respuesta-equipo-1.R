@@ -21,7 +21,7 @@ datos[["EN"]] <- ifelse(datos[["IMC"]] >= 25, 1, 0)
 head(datos)
 
 # Enunciado
-# 1. Definir la semilla a utilizar, que corresponde a los primeros cinco dígitos
+# 1. Definir la semilla a uwatilizar, que corresponde a los primeros cinco dígitos
 # del RUN del integrante de mayor edad del equipo.
 set.seed(20785)
 
@@ -39,9 +39,35 @@ muestra <- rbind(sobrepeso, nosobrepeso)
 # ni EN, y luego utilizar las funciones del paquete caret para construir un 
 # modelo de regresión lineal múltiple con los predictores escogidos y 
 # evaluarlo usando bootstrapping.
+
+# Se eliminan las variables IMC y EN del conjunto
 datos_n <- muestra %>% select(-c(IMC, EN)) 
 
+# Se hace el modelo con un máximo de 8 predictores
 modelo <- regsubsets(Weight ~ ., data = datos_n, nbest = 1, nvmax = 8,
                      method = "exhaustive")
 plot(modelo)
+
+# Los predictores con menos BIC son:
+# 
+
+# Se ajusta el modelo usando boostrapping
+modelo_boot <- train(Weight ~ ., data = datos_n, method = "lm",
+                     trControl = trainControl(method = "boot", number = 2999))
+
+# Se imprimen los resultados
+summary(modelo_boot)
+
+# Haciendo un poco de investigación sobre el paquete caret, en particular cómo 
+# hacer Recursive Feature Elimination (RFE), construir un modelo de regresión 
+# lineal múltiple para predecir la variable IMC que incluya entre 10 y 20 
+# predictores, seleccionando el conjunto de variables que maximice R2 y que 
+# use cinco repeticiones de validación cruzada de cinco pliegues para evitar 
+# el sobreajuste (obviamente no se debe considerar las variables Peso, Estatura 
+# ni estado nutricional –Weight, Height, EN respectivamente). 
+
+
+
+
+
 
