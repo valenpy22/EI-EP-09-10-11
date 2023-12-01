@@ -227,17 +227,35 @@ datos_en[["EN"]] <- NULL
 
 lrFuncs$summary <- twoClassSummary
 
+# Se crea el conjunto de datos para la construccion del modelo
 construccion <- rfeControl(functions = lrFuncs, method = "LOOCV")
 entrenamiento <- trainControl(method = "none", classProbs = TRUE,
                               summaryFunction = twoClassSummary)
 
+# Se crea el modelo para predecir la variable EN con una cantidad de predictores
+# mínimo de 2 y un máximo de 6.
 modelo_en <- rfe(datos_en, EN, metric = "ROC", rfeControl = construccion,
                  trControl = entrenamiento, sizes = 2:6)
 
+# Se muestra el modelo
 print(modelo_en)
 
-# Se consideran 4 variables
+# Se consideran 4 variables (al tener el asterisco marcado ahí) y se tiene 
+# que con las 4 variables:
+# Biacromial.diameter
+# Bitrochanteric.diameter
+# Calf.Maximum.Girth
+# Waist.Girth
+# se puede predecir mejor el modelo.
+# Con 4 variables el ROC es de 0,9632, siendo muy cercano a 1, por lo que se
+# sugiere que tiene una muy buena capacidad discriminativa.
+# Para el modelo seleccionado se tiene una sensibilidad del 94%, lo que indica
+# que el modelo es muy bueno detectando la clase positiva.
+# Además, se tiene una especificidad del 86%, lo que indica que es bueno evitando
+# falsos positivos.
 
+# Gracias al modelo se puede ver que el ROC se maximiza para cuando se tienen 4
+# predictores, con un valor de 96,32%.
 print(ggplot(modelo_en))
 
 # Se evalúa la calidad predictiva del modelo
@@ -245,6 +263,38 @@ predicciones <- predict(modelo_en, datos_en)[["pred"]]
 cat("La calidad predictiva del modelo es: ")
 print(confusionMatrix(predicciones, EN))
 
+# Con la matriz de confusión, se puede ver que el modelo predijo correctamente
+# 47 como negativos y 3 incorrectamente como positivos.
+# Además, predijo correctamente 47 como positivos y 3 incorrectamente como
+# negativos.
+# Se tiene una precisión del 94%, lo que significa que el 94% de las veces el
+# modelo hizo una predicción correcta.
+# El intervalo de confianza para la precisión es del 97,4% al 97,77%, lo que es
+# bastante alto y hace que el modelo sea seguro.
+# La tasa de no información es del 0.5, que sería la precisión de un modelo
+# que siempre predice la clase más frecuente sin ninguna información.
+# El valor estadístico Kappa es de 0.88, lo que significa que tiene una muy buena
+# concordancia entre las predicciones y observaciones reales.
+# El valor p de McNemar es 1, lo que indica que no hay una diferencia
+# significativa en el rendimiento del modelo entre las clases positivas
+# y negativas.
+# Tanto la sensibilidad como la especificidad son del 94%, lo que significa que
+# el modelo es igualmente bueno para identificar casos positivos y para evitar
+# falsos positivos.
+# El valor predictivo positivo y negativo son del 94%, lo que significa que cuando
+# el modelo predice una clase, es correcto el 94% de las veces.
+# La prevalencia tiene un valor del 0.5, lo que significa que la proporción
+# de los casos positivos en el conjunto de datos es del 50%.
+# La precisión equilibrada también es del 94%, lo que significa que el modelo es 
+# equilibrado y tiene un buen rendimiento para ambas clases.
+# Se indica que la clase '0' se considera la clase positiva para el cálculo de
+# las estadísticas.
+
+# CONCLUSIÓN GENERAL
+# El modelo funciona excepcionalmente bien con el conjunto de datos al tener
+# una alta precisión, sensibilidad y especificidad. 
+
 # 6. Pronunciarse sobre la confiabilidad y el poder predictivo de los 
-# modelos obtenidos.
+# modelos obtenidos. 
+# HECHO EN CADA ÍTEM 
 
